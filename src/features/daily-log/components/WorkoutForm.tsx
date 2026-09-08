@@ -1,16 +1,19 @@
 import { useState } from "react";
 import { Check } from "lucide-react";
+import { useDailyLogStore } from "../store/dailyLogStore";
 
 export default function WorkoutForm() {
   const [workout, setWorkout] = useState("");
   const [duration, setDuration] = useState("");
   const [completed, setCompleted] = useState(false);
+  const addWorkout = useDailyLogStore((state) => state.addWorkout);
 
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
     if (!workout || !duration) return;
 
+    addWorkout(workout, parseInt(duration));
     setCompleted(true);
   };
 

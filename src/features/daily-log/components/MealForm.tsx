@@ -1,16 +1,18 @@
 import { useState } from "react";
 import { Check } from "lucide-react";
+import { useDailyLogStore } from "../store/dailyLogStore";
 
 export default function MealForm() {
   const [meal, setMeal] = useState("");
   const [calories, setCalories] = useState("");
   const [saved, setSaved] = useState(false);
+  const addCalories = useDailyLogStore((state) => state.addCalories);
 
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
     if (!meal || !calories) return;
-
+    addCalories(parseInt(calories));
     setSaved(true);
   };
 

@@ -1,6 +1,9 @@
 import { useState } from "react";
 import WorkoutForm from "./components/WorkoutForm";
 import MealForm from "./components/MealForm";
+import WaterForm from "./components/WaterForm";
+import StepsForm from "./components/StepsForm";
+import { useDailyLogStore } from "./store/dailyLogStore";
 import {
   Check,
   Dumbbell,
@@ -38,6 +41,10 @@ const activities = [
 
 function DailyLogPage() {
   const [selected, setSelected] = useState<string | null>(null);
+  const calories = useDailyLogStore((state) => state.calories);
+  const steps = useDailyLogStore((state) => state.steps);
+  const water = useDailyLogStore((state) => state.water);
+  const workouts = useDailyLogStore((state) => state.workouts);
 
   return (
     <div className="mx-auto w-full max-w-4xl space-y-6">
@@ -93,6 +100,8 @@ function DailyLogPage() {
      {selected === "workout" && <WorkoutForm />}
 
     {selected === "food" && <MealForm />}
+    {selected === "water" && <WaterForm />}
+    {selected === "steps" && <StepsForm />}
 
       <section className="rounded-2xl border bg-card p-5 sm:p-6">
         <h2 className="font-semibold">Today's Summary</h2>
@@ -100,22 +109,22 @@ function DailyLogPage() {
         <div className="mt-5 grid grid-cols-2 gap-4 sm:grid-cols-4">
           <div>
             <p className="text-xs text-muted-foreground">Calories</p>
-            <p className="mt-1 text-xl font-bold">630</p>
+            <p className="mt-1 text-xl font-bold">{calories}</p>
           </div>
 
           <div>
             <p className="text-xs text-muted-foreground">Steps</p>
-            <p className="mt-1 text-xl font-bold">6,842</p>
+            <p className="mt-1 text-xl font-bold">{steps.toLocaleString()}</p>
           </div>
 
           <div>
             <p className="text-xs text-muted-foreground">Water</p>
-            <p className="mt-1 text-xl font-bold">1.8 L</p>
+            <p className="mt-1 text-xl font-bold">{(water / 1000).toFixed(1)} L</p>
           </div>
 
           <div>
             <p className="text-xs text-muted-foreground">Workouts</p>
-            <p className="mt-1 text-xl font-bold">4</p>
+            <p className="mt-1 text-xl font-bold">{workouts}</p>
           </div>
         </div>
       </section>
