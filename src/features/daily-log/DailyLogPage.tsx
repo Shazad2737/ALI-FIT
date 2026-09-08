@@ -3,6 +3,7 @@ import WorkoutForm from "./components/WorkoutForm";
 import MealForm from "./components/MealForm";
 import WaterForm from "./components/WaterForm";
 import StepsForm from "./components/StepsForm";
+import DailyHistory from "./components/DailyHistory";
 import { useDailyLogStore } from "./store/dailyLogStore";
 import {
   Check,
@@ -41,15 +42,26 @@ const activities = [
 
 function DailyLogPage() {
   const [selected, setSelected] = useState<string | null>(null);
-  const calories = useDailyLogStore((state) => state.calories);
-  const steps = useDailyLogStore((state) => state.steps);
-  const water = useDailyLogStore((state) => state.water);
-  const workouts = useDailyLogStore((state) => state.workouts);
+  const logs = useDailyLogStore((state) => state.logs);
+const date = useDailyLogStore((state) => state.date);
+
+const todayLog = logs[date];
+
+const calories = todayLog?.calories ?? 0;
+const steps = todayLog?.steps ?? 0;
+const water = todayLog?.water ?? 0;
+const workouts = todayLog?.workouts ?? 0;
 
   return (
     <div className="mx-auto w-full max-w-4xl space-y-6">
       <section>
-        <p className="text-sm font-medium text-primary">Today</p>
+       <p className="text-sm font-medium text-primary">
+     {new Date(date).toLocaleDateString("en-IN", {
+        weekday: "long",
+        day: "numeric",
+        month: "long",
+    })}
+    </p>
 
         <h1 className="mt-1 text-3xl font-bold tracking-tight">
           Daily Log
@@ -128,6 +140,7 @@ function DailyLogPage() {
           </div>
         </div>
       </section>
+      <DailyHistory />
     </div>
   );
 }

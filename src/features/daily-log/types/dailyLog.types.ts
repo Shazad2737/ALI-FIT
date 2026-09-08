@@ -4,3 +4,7 @@ export interface DailyLogState {
   water: number;
   workouts: number;
 }
+
+export interface DailyLogRecord extends DailyLogState {
+  date: string;
+}

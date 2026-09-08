@@ -1,41 +1,139 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
-import type { DailyLogState } from "../types/dailyLog.types";
+import type {
+  DailyLogState,
+  DailyLogRecord,
+} from "../types/dailyLog.types";
 
 interface DailyLogStore extends DailyLogState {
+  date: string;
+  logs: Record<string, DailyLogRecord>;
+
   addCalories: (amount: number) => void;
   addSteps: (amount: number) => void;
   addWater: (amount: number) => void;
   addWorkout: () => void;
 }
 
+const getToday = () => {
+  const now = new Date();
+
+  const year = now.getFullYear();
+  const month = String(now.getMonth() + 1).padStart(2, "0");
+  const day = String(now.getDate()).padStart(2, "0");
+
+  return `${year}-${month}-${day}`;
+};
+
+const today = getToday();
+
+const emptyLog: DailyLogState = {
+  calories: 0,
+  steps: 0,
+  water: 0,
+  workouts: 0,
+};
+
 export const useDailyLogStore = create<DailyLogStore>()(
   persist(
     (set) => ({
+      date: today,
+
       calories: 0,
       steps: 0,
       water: 0,
       workouts: 0,
 
+      logs: {
+        [today]: {
+          date: today,
+          ...emptyLog,
+        },
+      },
+
       addCalories: (amount) =>
-        set((state) => ({
-          calories: state.calories + amount,
-        })),
+        set((state) => {
+          const currentLog = state.logs[state.date] ?? {
+            date: state.date,
+            ...emptyLog,
+          };
+
+          const calories = currentLog.calories + amount;
+
+          return {
+            calories,
+            logs: {
+              ...state.logs,
+              [state.date]: {
+                ...currentLog,
+                calories,
+              },
+            },
+          };
+        }),
 
       addSteps: (amount) =>
-        set((state) => ({
-          steps: state.steps + amount,
-        })),
+        set((state) => {
+          const currentLog = state.logs[state.date] ?? {
+            date: state.date,
+            ...emptyLog,
+          };
+
+          const steps = currentLog.steps + amount;
+
+          return {
+            steps,
+            logs: {
+              ...state.logs,
+              [state.date]: {
+                ...currentLog,
+                steps,
+              },
+            },
+          };
+        }),
 
       addWater: (amount) =>
-        set((state) => ({
-          water: state.water + amount,
-        })),
+        set((state) => {
+          const currentLog = state.logs[state.date] ?? {
+            date: state.date,
+            ...emptyLog,
+          };
+
+          const water = currentLog.water + amount;
+
+          return {
+            water,
+            logs: {
+              ...state.logs,
+              [state.date]: {
+                ...currentLog,
+                water,
+              },
+            },
+          };
+        }),
 
       addWorkout: () =>
-        set((state) => ({
-          workouts: state.workouts + 1,
-        })),
+        set((state) => {
+          const currentLog = state.logs[state.date] ?? {
+            date: state.date,
+            ...emptyLog,
+          };
+
+          const workouts = currentLog.workouts + 1;
+
+          return {
+            workouts,
+            logs: {
+              ...state.logs,
+              [state.date]: {
+                ...currentLog,
+                workouts,
+              },
+            },
+          };
+        }),
     }),
     {
       name: "ali-fit-daily-log",
