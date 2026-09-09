@@ -11,6 +11,7 @@ export default function GoalsPage() {
 
   const [title, setTitle] = useState("");
   const [target, setTarget] = useState("");
+  const [error, setError] = useState("");
 
   const calories = useDailyLogStore((state) => state.calories);
   const steps = useDailyLogStore((state) => state.steps);
@@ -41,12 +42,30 @@ export default function GoalsPage() {
   const handleAddGoal = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
-    if (!title || !target) return;
+    setError("");
+
+   if (!title) {
+  setError("Please select a goal.");
+  return;
+}
+
+const targetValue = Number(target);
+
+if (!Number.isFinite(targetValue) || targetValue <= 0) {
+  setError("Please enter a valid target greater than 0.");
+  return;
+}
+
+const alreadyExists = goals.some(
+  (goal) => goal.title === title
+);
+
+setError("");
 
     addGoal({
       id: crypto.randomUUID(),
       title,
-      target: Number(target),
+      target: targetValue,
       current: 0,
       unit: getUnit(title),
       createdAt: new Date().toISOString(),
@@ -106,6 +125,12 @@ export default function GoalsPage() {
 
         </div>
 
+            {error && (
+        <p className="mt-3 rounded-xl bg-destructive/10 px-4 py-3 text-sm font-medium text-destructive">
+            {error}
+        </p>
+        )}
+
         <button
           type="submit"
           className="mt-4 flex w-full items-center justify-center gap-2 rounded-xl bg-primary px-4 py-3 text-sm font-semibold text-primary-foreground active:scale-[0.98] sm:w-auto"
@@ -119,27 +144,32 @@ export default function GoalsPage() {
         <h2 className="text-lg font-semibold">Your Goals</h2>
 
         {goals.length === 0 ? (
-          <div className="rounded-2xl border bg-card p-8 text-center">
-            <Target className="mx-auto h-10 w-10 text-muted-foreground" />
+        <div className="rounded-2xl border bg-card p-8 text-center">
+            <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-2xl bg-primary/10">
+            <Target className="h-6 w-6 text-primary" />
+            </div>
 
-            <p className="mt-3 font-medium">No goals yet</p>
+            <p className="mt-4 font-semibold">No goals yet</p>
 
-            <p className="mt-1 text-sm text-muted-foreground">
-              Create your first fitness goal above.
+            <p className="mx-auto mt-1 max-w-sm text-sm leading-6 text-muted-foreground">
+            Set your first fitness goal and track your progress from your daily activity.
             </p>
-          </div>
+        </div>
         ) : (
           goals.map((goal) => {
            const progressData = getGoalProgress(goal, dailyLog);
            const progress = progressData.percentage;
            const current = progressData.current;
            const remaining = progressData.remaining;
+           const isCompleted = progress >= 100;
 
             return (
               <div
-                key={goal.id}
-                className="rounded-2xl border bg-card p-5 shadow-sm"
-              >
+                    key={goal.id}
+                    className={`rounded-2xl border bg-card p-5 shadow-sm ${
+                        isCompleted ? "border-primary/40" : ""
+                    }`}
+            >
                 <div className="flex items-start justify-between gap-3">
                   <div className="min-w-0">
                     <h3 className="font-semibold">{goal.title}</h3>
@@ -181,6 +211,7 @@ export default function GoalsPage() {
                     <Trash2 className="h-4 w-4" />
                   </button>
                 </div>
+                
 
                 <div className="mt-4 h-2 overflow-hidden rounded-full bg-muted">
                   <div
@@ -188,20 +219,27 @@ export default function GoalsPage() {
                     style={{ width: `${progress}%` }}
                   />
                 </div>
+                            {isCompleted && (
+                    <div className="mt-4 rounded-xl bg-primary/10 px-4 py-3 text-sm font-medium text-primary">
+                        🎉 Goal completed! Keep going!
+                    </div>
+                    )}
 
                 <div className="mt-2 flex flex-wrap justify-between gap-2 text-xs text-muted-foreground">
-                  <span>
-                    {progress >= 100
-                        ? "100% complete"
+                  
+                    <span className={isCompleted ? "font-semibold text-primary" : ""}>
+                    {isCompleted
+                        ? "100% complete ✓"
                         : `${Math.round(progress)}% complete`}
                     </span>
 
-                  <span>
-                     {progress >= 100
-                     ? "Goal completed ✓"
-                    : `${remaining} ${goal.unit} remaining`}
+                  <span className={isCompleted ? "font-semibold text-primary" : ""}>
+                    {isCompleted
+                        ? "Goal completed ✓"
+                        : `${remaining} ${goal.unit} remaining`}
                     </span>
                 </div>
+                
 
               </div>
             );
