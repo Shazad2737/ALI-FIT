@@ -11,6 +11,8 @@ import {
   Droplets,
   Footprints,
   Utensils,
+  ChevronLeft,
+  ChevronRight,
 } from "lucide-react";
 
 const activities = [
@@ -44,6 +46,21 @@ function DailyLogPage() {
   const [selected, setSelected] = useState<string | null>(null);
   const logs = useDailyLogStore((state) => state.logs);
 const date = useDailyLogStore((state) => state.date);
+const setDate = useDailyLogStore((state) => state.setDate);
+const goToToday = useDailyLogStore((state) => state.goToToday);
+
+const changeDate = (days: number) => {
+  const currentDate = new Date(`${date}T00:00:00`);
+  currentDate.setDate(currentDate.getDate() + days);
+
+  const year = currentDate.getFullYear();
+  const month = String(currentDate.getMonth() + 1).padStart(2, "0");
+  const day = String(currentDate.getDate()).padStart(2, "0");
+
+  setDate(`${year}-${month}-${day}`);1
+};
+
+const isToday = date === new Date().toISOString().split("T")[0];
 
 const todayLog = logs[date];
 
@@ -55,13 +72,53 @@ const workouts = todayLog?.workouts ?? 0;
   return (
     <div className="mx-auto w-full max-w-4xl space-y-6">
       <section>
-       <p className="text-sm font-medium text-primary">
-     {new Date(date).toLocaleDateString("en-IN", {
-        weekday: "long",
+      <div className="flex items-center justify-between gap-2">
+  <button
+    type="button"
+    onClick={() => changeDate(-1)}
+    className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border bg-card transition-colors hover:bg-muted active:scale-95"
+    aria-label="Previous day"
+  >
+    <ChevronLeft className="h-5 w-5" />
+  </button>
+
+  <div className="min-w-0 flex-1 text-center">
+    <p className="text-sm font-medium text-primary">
+      {isToday
+        ? "Today"
+        : new Date(`${date}T00:00:00`).toLocaleDateString("en-IN", {
+            weekday: "long",
+          })}
+    </p>
+
+    <p className="mt-1 text-sm text-muted-foreground">
+      {new Date(`${date}T00:00:00`).toLocaleDateString("en-IN", {
         day: "numeric",
         month: "long",
-    })}
+        year: "numeric",
+      })}
     </p>
+  </div>
+
+  <button
+    type="button"
+    onClick={() => changeDate(1)}
+    className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border bg-card transition-colors hover:bg-muted active:scale-95"
+    aria-label="Next day"
+  >
+    <ChevronRight className="h-5 w-5" />
+  </button>
+</div>
+
+{!isToday && (
+  <button
+    type="button"
+    onClick={goToToday}
+    className="mx-auto block text-sm font-medium text-primary"
+  >
+    Back to Today
+  </button>
+)}
 
         <h1 className="mt-1 text-3xl font-bold tracking-tight">
           Daily Log

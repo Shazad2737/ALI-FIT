@@ -13,6 +13,8 @@ interface DailyLogStore extends DailyLogState {
   addSteps: (amount: number) => void;
   addWater: (amount: number) => void;
   addWorkout: () => void;
+  setDate: (date: string) => void;
+  goToToday: () => void;
 }
 
 const getToday = () => {
@@ -50,6 +52,76 @@ export const useDailyLogStore = create<DailyLogStore>()(
           ...emptyLog,
         },
       },
+     setDate: (date) =>
+  set((state) => {
+    const existingLog = state.logs[date];
+
+    if (existingLog) {
+      return {
+        date,
+        calories: existingLog.calories,
+        steps: existingLog.steps,
+        water: existingLog.water,
+        workouts: existingLog.workouts,
+      };
+    }
+
+    const newLog = {
+      date,
+      calories: 0,
+      steps: 0,
+      water: 0,
+      workouts: 0,
+    };
+
+    return {
+      date,
+      calories: 0,
+      steps: 0,
+      water: 0,
+      workouts: 0,
+      logs: {
+        ...state.logs,
+        [date]: newLog,
+      },
+    };
+  }),
+
+goToToday: () =>
+  set((state) => {
+    const today = getToday();
+    const existingLog = state.logs[today];
+
+    if (existingLog) {
+      return {
+        date: today,
+        calories: existingLog.calories,
+        steps: existingLog.steps,
+        water: existingLog.water,
+        workouts: existingLog.workouts,
+      };
+    }
+
+    const newLog = {
+      date: today,
+      calories: 0,
+      steps: 0,
+      water: 0,
+      workouts: 0,
+    };
+
+    return {
+      date: today,
+      calories: 0,
+      steps: 0,
+      water: 0,
+      workouts: 0,
+      logs: {
+        ...state.logs,
+        [today]: newLog,
+      },
+    };
+  }),
 
       addCalories: (amount) =>
         set((state) => {
