@@ -2,6 +2,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import AppLayout from "../components/layout/AppLayout";
 import DashboardPage from "../features/dashboard/DashboardPage";
 import DailyLogPage from "../features/daily-log/DailyLogPage";
+import GoalsPage from "../features/goals/GoalsPage";
 function Page({ title }: { title: string }) {
   return (
     <div>
@@ -23,9 +24,11 @@ export default function AppRouter() {
 
           <Route path="/daily-log" element={<DailyLogPage />} />
           <Route path="/analytics" element={<Page title="Analytics" />} />
+          <Route path="/goals" element={<GoalsPage />} />
           <Route path="/goals" element={<Page title="Goals" />} />
           <Route path="/weight" element={<Page title="Weight" />} />
           <Route path="/settings" element={<Page title="Settings" />} />
+
         </Route>
       </Routes>
     </BrowserRouter>
